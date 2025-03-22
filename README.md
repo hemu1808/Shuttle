@@ -12,7 +12,7 @@ Shuttle Free is a **real-time transit ticket booking app** that allows users to 
 
 ---
 
-## 🏗 Tech Stack
+## Tech Stack
 ###  **Frontend**
 - React.js (Web)
 - React Native (Mobile)
