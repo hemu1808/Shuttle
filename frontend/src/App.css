@@ -1,38 +1,86 @@
-.App {
-  text-align: center;
+:root {
+  --bg: #ffffff;
+  --text: #222;
+  --card: #f9f9f9;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.dark {
+  --bg: #1c1c1e;
+  --text: #e2e2e2;
+  --card: #2c2c2e;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", sans-serif;
+  transition: all 0.3s ease;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.app-container {
+  padding: 20px;
+}
+
+.app-header {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  justify-content: space-between;
+  background: var(--card);
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.toggle-theme {
+  cursor: pointer;
+}
+
+.event-title {
+  text-align: center;
+  font-size: 24px;
+  margin: 20px 0;
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.event-card {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.btn-primary {
+  background: #635bff;
   color: white;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
-.App-link {
-  color: #61dafb;
+.btn-secondary {
+  background: #ccc;
+  color: black;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.btn-primary:hover,
+.btn-secondary:hover {
+  opacity: 0.9;
+}
+.event-card h3 {
+  margin: 0 0 10px;
+}
+.event-card p {
+  margin: 0 0 15px;
+}
+.event-card .event-date {
+  font-size: 14px;
+  color: #666;
 }

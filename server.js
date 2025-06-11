@@ -1,56 +1,93 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import { Server } from "socket.io";
-import Razorpay from "razorpay";
-
+import dotenv from "dotenv";
 dotenv.config();
-const app = express();
-app.use(cors());
-app.use(express.json());
+import express from "express";
+import Event from "./models/Event.js";
+import stripePackage from "stripe";
+import { Server } from "socket.io";
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.log(err));
+const stripe = stripePackage(process.env.STRIPE_SECRET_KEY);
+const router = express.Router();
 
-// Sample Route
-app.get("/", (req, res) => res.send("Server Running!"));
+let io;
+export const setSocketInstance = (socketInstance) => {
+  io = socketInstance;
+};
 
-// Start Server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-
-
-const io = new Server(5001, { cors: { origin: "*" } });
-
-let lockedSeats = {};
-
-io.on("connection", (socket) => {
-  socket.on("lock-seat", (seatID) => {
-    lockedSeats[seatID] = true;
-    io.emit("update-seats", lockedSeats);
-  });
-
-  socket.on("release-seat", (seatID) => {
-    delete lockedSeats[seatID];
-    io.emit("update-seats", lockedSeats);
-  });
+// Get all events
+router.get("/events", async (req, res) => {
+  const events = await Event.find();
+  res.json(events);
 });
 
+// Seat Lock
+router.post("/lock-seat", async (req, res) => {
+  const { eventId, seatNumber } = req.body;
+  try {
+    const event = await Event.findById(eventId);
+    if (!event || event.bookedSeats.includes(seatNumber)) {
+      return res.status(400).json({ message: "Seat already booked or invalid event." });
+    }
 
-
-const razorpay = new Razorpay({
-  key_id: "YOUR_KEY_ID",
-  key_secret: "YOUR_SECRET",
+    io.emit("seat-locked", { eventId, seatNumber });
+    res.status(200).json({ message: "Seat locked." });
+  } catch (error) {
+    res.status(500).json({ message: "Server error." });
+  }
 });
 
-app.post("/payment", async (req, res) => {
-  const payment = await razorpay.orders.create({
-    amount: req.body.amount * 100,
-    currency: "INR",
-  });
-  res.json(payment);
+// Stripe Checkout
+router.post("/create-stripe-session", async (req, res) => {
+  const { eventId, selectedSeats } = req.body;
+  try {
+    const event = await Event.findById(eventId);
+    const unavailable = selectedSeats.some(seat => event.bookedSeats.includes(seat));
+    if (unavailable) return res.status(409).json({ message: "One or more seats are already booked." });
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "inr",
+            product_data: {
+              name: `${event.name} Tickets`,
+            },
+            unit_amount: event.price * 100 * selectedSeats.length,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: `${process.env.CLIENT_URL}/success?eventId=${eventId}&seats=${selectedSeats.join(",")}`,
+      cancel_url: `${process.env.CLIENT_URL}/cancel`,
+    });
+
+    res.json({ url: session.url });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Stripe session error." });
+  }
 });
+
+// Confirm Booking
+router.post("/confirm-booking", async (req, res) => {
+  const { eventId, seats } = req.body;
+  try {
+    const event = await Event.findById(eventId);
+    const duplicates = seats.filter(seat => event.bookedSeats.includes(seat));
+    if (duplicates.length > 0) return res.status(409).json({ message: "Some seats already booked." });
+
+    event.bookedSeats.push(...seats);
+    await event.save();
+
+    io.emit("update-seats", await Event.find());
+    res.status(200).json({ message: "Booking confirmed." });
+  } catch (err) {
+    res.status(500).json({ message: "Booking failed." });
+  }
+});
+
+//module.exports = { router, setSocketInstance };
+//module.exports = router;
+//const mongoose = require("mongoose"); 
+export default router;
