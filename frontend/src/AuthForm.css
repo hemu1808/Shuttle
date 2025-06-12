@@ -1,0 +1,14 @@
+.auth-container { display: grid; place-items: center; min-height: 100vh; background-color: var(--bg-light); }
+.dark-theme .auth-container { background-color: var(--bg-dark); }
+.auth-form { width: 100%; max-width: 400px; padding: 2.5rem; background: var(--sidebar-light); border-radius: 12px; box-shadow: var(--shadow); }
+.dark-theme .auth-form { background: var(--sidebar-dark); }
+.auth-form h2 { text-align: center; margin: 0 0 0.5rem 0; color: var(--text-light); }
+.dark-theme .auth-form h2 { color: var(--text-dark); }
+.auth-form p { text-align: center; margin-bottom: 2rem; color: var(--text-muted-light); }
+.dark-theme .auth-form p { color: var(--text-muted-dark); }
+.auth-form form input { width: 100%; padding: 0.8rem 1rem; margin-bottom: 1rem; border: 1px solid var(--card-border-light); border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
+.dark-theme .auth-form form input { background: var(--bg-dark); border-color: var(--card-border-dark); color: var(--text-dark); }
+.error-message { color: #ef4444; font-size: 0.9rem; text-align: left; }
+.auth-btn { width: 100%; padding: 0.8rem; font-size: 1rem; font-weight: 500; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; }
+.switch-auth { font-size: 0.9rem; margin-top: 1.5rem; }
+.switch-auth a { color: var(--accent); text-decoration: none; font-weight: 500; }
