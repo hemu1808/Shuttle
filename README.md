@@ -1,137 +1,95 @@
-# Shuttle Free - Real-Time Ticket Booking App
+# ShuttleNow - Real-Time Shuttle Booking Platform
 
-Shuttle Free is a **real-time transit ticket booking app** that allows users to book seats dynamically while ensuring **real-time seat availability, secure payments, and AI-powered recommendations**.
+ShuttleNow is a full-stack web application designed to provide a seamless, real-time booking experience for shuttle services. It features a modern, interactive user interface, separate portals for users and administrators, and live-tracking capabilities. This project was built from the ground up, progressively adding advanced features to create a robust and professional-level platform.
 
-##  Key Features
- **User Authentication** (Firebase Auth)  
- **Real-time Seat Availability** (WebSockets)  
- **Secure Payments** (Razorpay API)  
- **Dynamic Pricing Model** (AI-based)  
- **Scalable Backend** (Node.js & MongoDB)  
- **Mobile & Web Support** (React.js & React Native)  
+## Key Features
 
----
+This project incorporates a wide range of modern web development features:
+
+* **Real-Time Seat Selection:**
+    * Users can view shuttle layouts and select seats.
+    * Uses **Socket.IO** to implement "soft locking," where a seat selected by one user is instantly shown as unavailable to all other users in real-time, preventing booking conflicts.
+
+* **Dual Authentication System:**
+    * **User Authentication:** A secure portal for users to sign up, log in, and manage their profiles using JWT (JSON Web Tokens).
+    * **Admin Authentication:** A separate, protected portal for administrators to manage the platform.
+
+* **Interactive Mapping & Routing:**
+    * Integrates the **Google Maps API** to provide a dynamic, responsive map experience.
+    * **Live Route Drawing:** Automatically calculates and displays the shuttle's route from origin to destination using the Directions Service.
+    * **Live Shuttle Tracking:** Admins can simulate a shuttle's journey, and its location is updated on the map for all users in real-time via WebSockets.
+
+* **Full-Fledged Admin Dashboard:**
+    * **Event CRUD:** Administrators have full Create, Read, Update, and Delete capabilities for shuttle events.
+    * **Intelligent Location Input:** The event creation form uses the Google Places Autocomplete API. Admins can type a location name (e.g., "Atlanta"), and the form automatically populates the precise latitude and longitude, ensuring map accuracy.
+    * The dashboard is a protected route, accessible only to authenticated admins.
+
+* **Flexible Booking Options:**
+    * **Profile-Based Booking:** Logged-in users can book tickets that are automatically saved to their "My Bookings" profile.
+    * **Guest Checkout:** Users have the option to book a ticket by providing only a phone number, offering a frictionless experience for one-time users.
+
+* **Digital QR Code Tickets:**
+    * Upon successful payment and booking confirmation, the system generates a unique **QR Code** for each ticket.
+    * Users can view their QR codes on the booking success page and in their profile, which can be scanned for verification at the shuttle entry point.
+
+* **Modern, Responsive UI:**
+    * A clean, professional user interface built with React, featuring a two-column layout.
+    * Smooth animations and transitions powered by **Framer Motion**.
+    * Includes a dark mode/light mode theme toggle for user preference.
+
+## How It Was Built
+
+This project was developed incrementally, starting with a basic concept and layering on advanced features.
+
+1.  **Foundation (MERN Stack):** The project started with a core **MongoDB, Express.js, React, and Node.js** stack to handle basic event display and booking logic.
+2.  **Introducing Real-Time:** **Socket.IO** was integrated to enable real-time communication between the client and server, forming the basis for the live seat locking and map tracking features.
+3.  **Building the Admin Panel:** A separate authentication system was built for admins, along with a full CRUD API to manage events. The frontend dashboard was then created to consume this API.
+4.  **Enhancing the User Experience:** The booking flow was upgraded to include full user authentication, guest checkout options, and profile management.
+5.  **Advanced Map Integration:** The initial static map was replaced with a fully interactive **Google Maps** component. This was further enhanced with the **Directions API** to draw routes and the **Places API** for intelligent, responsive location searching in the admin panel.
+6.  **Ticket System:** The booking confirmation process was upgraded to generate and store QR codes, transforming a simple booking into a verifiable digital ticket.
 
 ## Tech Stack
-###  **Frontend**
-- React.js (Web)
-- React Native (Mobile)
-- Tailwind CSS (Web UI)
-- Firebase Authentication
 
-###  **Backend**
-- Node.js (Express.js)
-- MongoDB (MongoDB Atlas)
-- WebSockets (Socket.io)
-- Razorpay API (Payments)
+#### Backend
 
-###  **Other Integrations**
-- Image Uploads (Cloudinary)
-- Docker (Optional for deployment)
-- AWS (Future Deployment: Amplify, AppSync, DynamoDB)
+* **Node.js & Express.js:** For the server-side logic and API.
+* **MongoDB & Mongoose:** As the database for storing events, users, and bookings.
+* **Socket.IO:** For real-time, bidirectional communication.
+* **Stripe:** To handle payment processing securely.
+* **JSON Web Tokens (JWT):** For securing user and admin authentication.
+* **bcryptjs:** For securely hashing passwords.
+* **qrcode:** For generating QR code tickets on the server.
 
----
+#### Frontend
 
-##  Quick Start Guide
+* **React:** For building the user interface.
+* **React Router:** For client-side routing and navigation.
+* **Axios:** For making API requests to the backend.
+* **Socket.IO Client:** To connect to the real-time server.
+* **Google Maps API for React (`@react-google-maps/api`):** For all map-related functionalities.
+* **Framer Motion:** For smooth page transitions and animations.
 
-###  **Clone the Repository**
-```sh
-git clone https://github.com/your-username/shuttle-free.git
-cd shuttle-free
-```
+## Setup and Installation
 
----
+To run this project locally:
 
-##  **2. Backend Setup**
-```sh
-cd backend
-npm install
-```
-
-###  **Configure Environment Variables**
-Create a `.env` file in the `backend` folder:
-```env
-PORT=5000
-MONGO_URI=mongodb+srv://your_mongo_user:password@cluster.mongodb.net/shuttleDB
-RAZORPAY_KEY_ID=your_key
-RAZORPAY_SECRET=your_secret
-JWT_SECRET=your_jwt_secret
-```
-
-###  **Run the Backend Server**
-```sh
-npm start
-```
----
-
-##  **3. Frontend Setup**
-```sh
-cd frontend
-npm install
-npm start
-```
-> **Note:** Ensure the backend is running before launching the frontend.
-
----
-
-##  **4. Mobile Setup (React Native)**
-```sh
-cd mobile
-npm install
-npx react-native start
-```
-> **Note:** For testing, use an **Android Emulator** or **Expo Go** for iOS.
-
----
-
-##  **5. API Endpoints**
-###  **User Authentication**
-| Method | Endpoint      | Description  |
-|--------|-------------|--------------|
-| `POST` | `/api/register` | User Signup  |
-| `POST` | `/api/login`    | User Login   |
-
-###  **Ticket Booking**
-| Method | Endpoint        | Description |
-|--------|----------------|-------------|
-| `GET`  | `/api/bookings` | View Bookings |
-| `POST` | `/api/bookings` | Book a Ticket |
-| `DELETE` | `/api/bookings/:id` | Cancel Booking |
-
-###  **Payment Processing**
-| Method | Endpoint        | Description |
-|--------|----------------|-------------|
-| `POST` | `/api/payments` | Process Payment |
-
----
-
-## 📸 Screenshots
-🚀 *Coming Soon...*
-
----
-
-##  Future Enhancements
-- 🌍 **Deploy on AWS (Amplify, AppSync, DynamoDB)**
-- 📱 **Native Android/iOS Apps**
-- 🤖 **AI-powered Pricing Optimization**
-- 🛒 **Coupon & Discounts System**
-
----
-
-## Contributing
-Pull requests are welcome! Feel free to **open an issue** for discussion.
-
-## License
-This project is licensed under the **MIT License**.
-```
-
----
-
-### **What This README Covers**
-✔ **Project Overview**  
-✔ **Key Features**  
-✔ **Tech Stack**  
-✔ **Installation & Setup** (Backend, Frontend, Mobile)  
-✔ **API Endpoints**  
-✔ **Future Roadmap**  
-✔ **Contribution Guidelines & License**  
+1.  **Clone the repository:**
+    ```bash
+    git clone [your-repository-url]
+    cd shuttle-now
+    ```
+2.  **Backend Setup:**
+    ```bash
+    # Navigate to the root folder
+    npm install
+    # Create a .env file and add your keys (MONGO_URI, STRIPE_SECRET_KEY, JWT_SECRET)
+    node server.js
+    ```
+3.  **Frontend Setup:**
+    ```bash
+    # Navigate to the frontend folder
+    cd frontend
+    npm install
+    # Create a .env file and add your Google Maps API Key (REACT_APP_GOOGLE_MAPS_API_KEY)
+    npm start
+    ```
